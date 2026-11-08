@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f7f5ef">
+<title>NaijaFoodWatch: sell, store or buy</title>
+<style>
+:root{--bg:#f7f5ef;--card:#fff;--ink:#1c2420;--mute:#66726a;--line:#e3dfd3;--SELL:#b4532a;--STORE:#2a5d8f;--BUY:#2f7d4f;--WAIT:#8a6d1d;--good:#2f7d4f;--bad:#b4532a}
+@media (prefers-color-scheme:dark){:root{--bg:#121613;--card:#1a201c;--ink:#eef2ee;--mute:#9aa89f;--line:#2b342e;--SELL:#e8845a;--STORE:#6ea8e0;--BUY:#5fc08a;--WAIT:#d9b44a;--good:#5fc08a;--bad:#e8845a}}
+*{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+main{max-width:880px;margin:0 auto;padding:20px 18px 48px}
+header{display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px solid var(--line);padding-bottom:12px;margin-bottom:20px}
+.brand{font-weight:700;letter-spacing:.01em}.sdg{font-size:.75rem;color:var(--mute)}
+h2{font-size:.78rem;text-transform:uppercase;letter-spacing:.09em;color:var(--mute);margin:30px 0 10px;font-weight:600}
+.controls{display:grid;grid-template-columns:1fr 1fr 120px;gap:10px}
+.seg{display:flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;grid-column:1/-1}
+.seg button{flex:1;padding:11px;border:0;background:var(--card);color:var(--mute);font:inherit;font-weight:600;cursor:pointer}
+.seg button.on{background:var(--ink);color:var(--bg)}
+select,input{width:100%;padding:11px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);font:inherit}
+details{grid-column:1/-1;font-size:.9rem;color:var(--mute)}details>div{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px}
+.verdict{display:flex;gap:22px;align-items:center;flex-wrap:wrap}
+.word{font:700 3.4rem/1 Georgia,"Times New Roman",serif;letter-spacing:-.01em}
+.why{flex:1;min-width:230px;font-size:1.05rem}
+.chip{display:inline-block;margin-top:10px;font-size:.78rem;color:var(--mute);border:1px solid var(--line);border-radius:99px;padding:2px 10px}
+.track{position:relative;height:10px;border-radius:6px;background:linear-gradient(90deg,#9fd3b0 0 38%,#e8dca6 38% 66%,#efb89c 66%);margin:26px 0 6px}
+.dot{position:absolute;top:-6px;width:22px;height:22px;border-radius:50%;background:var(--ink);border:3px solid var(--card);transform:translateX(-50%)}
+.scale{display:flex;justify-content:space-between;font-size:.75rem;color:var(--mute)}
+svg{width:100%;height:auto;display:block}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.stat b{display:block;font-size:1.35rem}.stat span{font-size:.8rem;color:var(--mute)}
+.warn{padding:9px 12px;border-left:3px solid var(--bad);background:color-mix(in srgb,var(--bad) 7%,transparent);margin:8px 0;font-size:.92rem;border-radius:0 8px 8px 0}
+.warn.lo{border-color:var(--good);background:color-mix(in srgb,var(--good) 7%,transparent)}
+.fac{display:grid;grid-template-columns:150px 1fr;gap:10px;align-items:center;margin:8px 0;font-size:.85rem}
+.bar{position:relative;height:12px;background:var(--line);border-radius:6px}.bar i{position:absolute;top:0;height:12px;border-radius:6px}.bar:after{content:"";position:absolute;left:50%;top:-3px;width:1px;height:18px;background:var(--mute)}
+.ends{display:flex;justify-content:space-between;font-size:.72rem;color:var(--mute);margin-left:160px}
+table{width:100%;border-collapse:collapse;font-size:.92rem}td{padding:9px 4px;border-top:1px solid var(--line)}td:last-child,td:nth-child(3){text-align:right}
+.pill{font-size:.75rem;font-weight:700;padding:2px 10px;border-radius:99px;color:#fff}
+.note{font-size:.8rem;color:var(--mute);margin-top:22px}.off{background:var(--WAIT);color:#fff;padding:6px 12px;font-size:.85rem;text-align:center}
+@media(max-width:560px){.controls{grid-template-columns:1fr}.stats{grid-template-columns:1fr}.word{font-size:2.8rem}.fac{grid-template-columns:110px 1fr}.ends{margin-left:120px}}
+</style>
+</head>
+<body>
+<div id="off" class="off" hidden>Offline: showing your last saved guidance.</div>
+<main>
+<header><span class="brand">NaijaFoodWatch</span><span class="sdg">SDG 1 No Poverty &middot; SDG 2 Zero Hunger</span></header>
+<div class="controls">
+  <div class="seg"><button data-r="grow" class="on">I'm selling my harvest</button><button data-r="buy">I'm buying food</button></div>
+  <select id="crop" aria-label="Food or crop"></select>
+  <input id="qty" type="number" min="1" value="100" aria-label="Quantity in kg">
+  <details><summary>My storage and weather</summary><div>
+    <select id="storage"><option value="good">Dry, sealed storage</option><option value="fair" selected>Basic bags</option><option value="poor">Open or damp</option></select>
+    <select id="weather"><option value="dry">Dry and stable</option><option value="mixed" selected>Mixed weather</option><option value="wet">Heavy rain / flood risk</option></select>
+  </div></details>
+</div>
+
+<h2>Today's guidance</h2>
+<p class="note" id="asof" style="margin:-4px 0 10px"></p>
+<div id="est" class="warn" hidden></div>
+<div class="card verdict"><div class="word" id="word">...</div><div class="why"><div id="why"></div><span class="chip" id="conf"></span></div></div>
+
+<h2>Is the price high or low?</h2>
+<div class="card"><div class="track"><div class="dot" id="dot"></div></div><div class="scale"><span>Cheap</span><span>Normal</span><span>Expensive</span></div><p id="posTxt" class="note" style="margin:10px 0 0"></p></div>
+
+<h2>Where prices are heading</h2>
+<div class="card"><svg id="chart" viewBox="0 0 640 230" role="img" aria-label="Price history and 3 month outlook"></svg><p class="note" style="margin:6px 0 0">Filled dots are real readings. Hollow dots are estimated by interpolation.</p></div>
+
+<h2>What it means for your money</h2>
+<div class="card stats" id="money"></div>
+
+<h2>Data behind this advice</h2>
+<div class="card"><div id="q"></div><table id="obs" style="margin-top:12px"></table></div>
+
+<h2>Early warnings</h2><div id="warns"></div>
+
+<h2>Why this advice</h2>
+<div class="card"><div id="fac"></div><div class="ends"><span id="l"></span><span id="r"></span></div></div>
+
+<h2>All foods at a glance</h2>
+<div class="card"><table id="watch"></table></div>
+<p class="note" id="foot"></p>
+</main>
+<script>
+const $=id=>document.getElementById(id), COL={SELL:"var(--SELL)",STORE:"var(--STORE)",BUY:"var(--BUY)",WAIT:"var(--WAIT)","NO DATA":"var(--mute)"};
+const N=x=>"N"+Math.round(x).toLocaleString(), P=x=>(x>=0?"+":"")+Math.round(x*100)+"%";
+const MN=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const mon=s=>{const[y,m]=s.split("-");return MN[+m-1]+" "+y};
+const add=(s,n)=>{let[y,m]=s.split("-").map(Number);m+=n;y+=Math.floor((m-1)/12);m=(m-1)%12+1;return y+"-"+String(m).padStart(2,"0")};
+const today=()=>new Date().toLocaleDateString(undefined,{day:"numeric",month:"short",year:"numeric"});
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+let role="grow",last=null;
+document.querySelectorAll(".seg button").forEach(b=>b.onclick=()=>{document.querySelectorAll(".seg button").forEach(x=>x.classList.remove("on"));b.classList.add("on");role=b.dataset.r;load()});
+["crop","storage","weather"].forEach(i=>$(i).onchange=load);$("qty").oninput=()=>last&&render(last);
+const qs=()=>new URLSearchParams({crop:$("crop").value,role,storage:$("storage").value,weather:$("weather").value});
+
+async function init(){
+  try{(await (await fetch("/api/foods")).json()).forEach(f=>$("crop").add(new Option(f,f)));localStorage.setItem("foods",$("crop").innerHTML)}
+  catch(e){$("crop").innerHTML=localStorage.getItem("foods")||""}
+  load();
+}
+async function load(){
+  try{const r=await fetch("/api/signal?"+qs());if(!r.ok)throw 0;last=await r.json();$("off").hidden=true;localStorage.setItem("last",JSON.stringify(last))}
+  catch(e){const c=localStorage.getItem("last");if(!c)return;last=JSON.parse(c);$("off").hidden=false}
+  render(last);
+  fetch("/api/watch?"+qs()).then(r=>r.json()).then(rows=>{$("watch").innerHTML=rows.map(r=>`<tr><td>${esc(r.crop)}</td><td><span class="pill" style="background:${COL[r.action]}">${r.action}</span></td><td>${r.last==null?"-":N(r.last)}<br><small style="color:var(--mute)">${mon(r.last_month)}</small></td><td>${r.outlook==null?"no current data":P(r.outlook)+" by "+mon(add(r.last_month,3))}</td></tr>`).join("")}).catch(()=>{});
+}
+function render(a){
+  if(a.usable===false){$("word").textContent="No data";$("word").style.color="var(--mute)";$("why").textContent=a.why;$("conf").textContent="Source: "+a.source+", latest "+a.last_month;$("asof").textContent="Latest real price: "+mon(a.last_month)+" ("+a.source+"). Today: "+today()+".";["chart","money","warns","fac"].forEach(i=>$(i).innerHTML="");qual(a);$("obs").innerHTML="";$("posTxt").textContent="";$("dot").style.left="50%";$("foot").textContent="Pick a food marked with recent data to see guidance.";return}
+  $("word").textContent=a.action[0]+a.action.slice(1).toLowerCase();$("word").style.color=COL[a.action];
+  $("why").textContent=a.why;$("conf").textContent="Confidence: "+a.conf;$("asof").textContent="Prices as of "+mon(a.last_month)+" ("+a.source+") · outlook to "+mon(add(a.last_month,3))+" · today "+today();qual(a);$("conf").textContent="Confidence: "+a.conf+" · Data grade "+a.quality.grade+" ("+a.quality.label+")";
+  $("obs").innerHTML="<tr><td><b>Month</b></td><td><b>Price</b></td><td><b>Type</b></td></tr>"+a.observations.map(o=>`<tr><td>${mon(o.month)}</td><td>${N(o.price)}</td><td>${o.type==="observed"?"Observed"+(o.markets?` (${o.markets} markets)`:""):"Estimated (interpolated)"}</td></tr>`).join("");
+  $("dot").style.left=Math.max(2,Math.min(98,(a.pos+0.3)/0.6*100))+"%";
+  $("posTxt").textContent=`${N(a.last)} today vs ${N(a.avg12)} normal (${P(a.pos)}).`;
+  chart(a);
+  const q=+$("qty").value||0,now=q*a.last,later=q*a.fut,tgt=add(a.last_month,3);
+  $("money").innerHTML=role==="grow"?
+   stat(N(now),`Sell ${q} kg today`)+stat(N(later-now*a.carry),"Store until "+mon(tgt)+" (expected)")+stat("up to "+N(now),"Possible loss if it spoils"):
+   stat(N(now),`Buy ${q} kg today`)+stat(N(later),"Same food by "+mon(tgt))+stat(a.inflation+"%","National food inflation, yearly");
+  $("warns").innerHTML=a.warns.map(w=>`<div class="warn ${w[0]==="lo"?"lo":""}">${esc(w[1])}</div>`).join("");
+  $("fac").innerHTML=a.factors.map(f=>{const v=f[1],w=Math.abs(v)*50;return `<div class="fac"><span>${esc(f[0])}</span><div class="bar"><i style="${v>=0?"left:50%":"right:50%"};width:${w}%;background:${v>=0?"var(--good)":"var(--bad)"}"></i></div></div>`}).join("");
+  $("l").textContent="< "+a.left;$("r").textContent=a.right+" >";
+  $("foot").textContent=`Only about ${Math.round(a.share*100)}% of the months behind this price are genuine ${a.source} readings (latest: ${a.last_month}); the rest are interpolated. This is a planning guide, not a guarantee. Check local market prices.`;
+}
+function qual(a){const d=a.quality;$("est").hidden=!d.estimated;$("est").textContent=d.estimated?"ESTIMATED PRICES: "+d.note:"";
+  $("q").innerHTML=`<p style="margin:0 0 8px"><b>Source:</b> ${esc(a.source_text)} <b>Data grade ${d.grade}: ${d.label}.</b></p>`+d.checks.map(c=>`<div class="warn ${c[1]?"lo":""}">${c[1]?"Passed":"Check"}: ${esc(c[0])} - ${esc(c[2])}</div>`).join("")}
+const stat=(v,l)=>`<div class="stat"><b>${v}</b><span>${l}</span></div>`;
+function chart(a){
+  const H=a.history.y,F=a.forecast,all=[...H,...F.lo,...F.hi,a.avg12],mn=Math.min(...all)*.96,mx=Math.max(...all)*1.04;
+  const n=H.length+F.y.length,X=i=>30+i*(600/(n-1)),Y=v=>200-(v-mn)/(mx-mn)*180;
+  const hp=H.map((v,i)=>`${X(i)},${Y(v)}`).join(" "),k=H.length-1;
+  const fp=[[k,H[k]],...F.y.map((v,i)=>[k+1+i,v])].map(p=>`${X(p[0])},${Y(p[1])}`).join(" ");
+  const up=F.hi.map((v,i)=>`${X(k+1+i)},${Y(v)}`),lo=F.lo.map((v,i)=>`${X(k+1+i)},${Y(v)}`).reverse();
+  $("chart").innerHTML=`<line x1="30" x2="630" y1="${Y(a.avg12)}" y2="${Y(a.avg12)}" stroke="var(--mute)" stroke-dasharray="4 5"/><text x="32" y="${Y(a.avg12)-6}" font-size="11" fill="var(--mute)">normal price</text>
+  <polygon points="${[`${X(k)},${Y(H[k])}`,...up,...lo].join(" ")}" fill="${COL[a.action]}" opacity=".15"/>
+  <polyline points="${hp}" fill="none" stroke="var(--ink)" stroke-width="2.5"/><polyline points="${fp}" fill="none" stroke="${COL[a.action]}" stroke-width="2.5" stroke-dasharray="6 5"/>
+  ${a.observations.map((o,i)=>`<circle cx="${X(i)}" cy="${Y(o.price)}" r="3.5" fill="${o.type==="observed"?"var(--ink)":"var(--card)"}" stroke="var(--ink)" stroke-width="1.5"/>`).join("")}<circle cx="${X(k)}" cy="${Y(H[k])}" r="5" fill="var(--ink)"/><text x="30" y="224" font-size="11" fill="var(--mute)">${mon(a.history.x[0])}</text><text x="${X(k)}" y="224" font-size="11" text-anchor="middle" fill="var(--mute)">${mon(a.history.x[k])}</text><text x="630" y="224" font-size="11" text-anchor="end" fill="var(--mute)">${mon(F.x[F.x.length-1])}</text>`;
+}
+init();
+</script>
+</body>
+</html>

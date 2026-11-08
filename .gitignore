@@ -1,0 +1,12 @@
+.venv/
+__pycache__/
+*.pyc
+.idea/
+*.bak
+*.bak2
+*.bak3
+.env
+.streamlit/secrets.toml
+apply_chat_view.py
+data/cache/
+data/nbs_reports/
