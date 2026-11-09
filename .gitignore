@@ -1,4 +1,5 @@
 .venv/
+venv/
 __pycache__/
 *.pyc
 .idea/
@@ -9,4 +10,4 @@ __pycache__/
 .streamlit/secrets.toml
 apply_chat_view.py
 data/cache/
-data/nbs_reports/
+*(1).zip
