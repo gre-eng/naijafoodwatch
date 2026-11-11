@@ -4,7 +4,7 @@
 
 A Streamlit app that tracks and forecasts Nigerian food prices using NBS Selected Food Price Watch reports, with live CPI, exchange rate and Brent crude data.
 
-**Live app:** https://naijafoodwatch-g9xcjgsnzhnj5yfdzmqrry.streamlit.app
+**Live app:** [https://naijafoodwatch-g9xcjgsnzhnj5yfdzmqrry.streamlit.app](https://naijafoodwatch.streamlit.app)
 
 ## Data sources
 - NBS Selected Food Price Watch
